@@ -1,0 +1,18 @@
+{
+  "components\\Navbar.js -> gsap": {
+    "id": "components\\Navbar.js -> gsap",
+    "files": []
+  },
+  "components\\Navbar.js -> gsap/ScrollTrigger": {
+    "id": "components\\Navbar.js -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "pages\\_app.js -> context/pageContext": {
+    "id": "pages\\_app.js -> context/pageContext",
+    "files": [
+      "static/chunks/context_pageContext_jsx.js"
+    ]
+  }
+}
