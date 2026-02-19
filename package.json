@@ -29,6 +29,9 @@
   "main": "next.config.js",
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.17.0"
+  },
   "devDependencies": {
     "@types/json5": "^0.0.30",
     "@types/semver": "^7.5.8",

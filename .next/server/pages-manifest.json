@@ -1,6 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/": "pages/index.js"
-}
+{"/_document":"pages/_document.js","/_app":"pages/_app.js","/about":"pages/about.html","/api/hello":"pages/api/hello.js","/contact":"pages/contact.html","/":"pages/index.html","/projects/associations":"pages/projects/associations.html","/projects/coral-gables":"pages/projects/coral-gables.html","/projects/portfolio":"pages/projects/portfolio.html","/repertoires":"pages/repertoires.html","/_error":"pages/_error.js","/404":"pages/404.html"}
