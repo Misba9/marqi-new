@@ -9,7 +9,8 @@ import Link from "next/link";
 import localFont from "next/font/local";
 import { Source_Sans_3 } from "next/font/google";
 import Image from "next/image";
-import logo from "/public/marqi-logo.png";
+import logoLight from "../public/logo-white.png";
+import logoDark from "../public/logo-dark.png";
 import { useRouter } from "next/router";
 
 // Local font imports
@@ -24,11 +25,11 @@ const sourcesans = Source_Sans_3({ subsets: ["latin"] });
 const links = [
   { title: "main", href: "/" },
   { title: "about", href: "/about" },
-  { title: "portfolio", href: "/projects/portfolio" },
   {
     title: "projects",
     subLink: true,
     subTitle: [
+      { title: "portfolio", href: "/projects/portfolio" },
       { title: "associations", href: "/projects/associations" },
       { title: "coral gables", href: "/projects/coral-gables" },
     ],
@@ -41,6 +42,7 @@ const Navbar = () => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [nav, setNav] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const submenuRef = useRef(null);
   const mobileNav = useRef(null);
   const associate = useRef(null);
@@ -86,6 +88,46 @@ const Navbar = () => {
     setNav((prevNav) => !prevNav);
   }, []);
 
+  // Scroll event listener for header background and text color changes
+  useEffect(() => {
+    const handleScroll = () => {
+      const nav = document.querySelector("nav");
+      if (!nav) return;
+
+      const scrolled = window.scrollY > 50;
+      setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
+
+      if (scrolled) {
+        // Add scrolled class
+        if (!nav.classList.contains("scrolled")) {
+          nav.classList.add("scrolled");
+        }
+      } else {
+        // Remove scrolled class
+        if (nav.classList.contains("scrolled")) {
+          nav.classList.remove("scrolled");
+        }
+      }
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const preloadLight = new window.Image();
+    preloadLight.src = logoLight.src;
+    const preloadDark = new window.Image();
+    preloadDark.src = logoDark.src;
+  }, []);
+
+  const logoSrc = useMemo(
+    () => (isScrolled ? logoDark : logoLight),
+    [isScrolled]
+  );
+
   useEffect(() => {
     const loadGSAP = async () => {
       const { gsap } = await import("gsap");
@@ -93,38 +135,15 @@ const Navbar = () => {
 
       gsap.registerPlugin(ScrollTrigger);
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: document.body,
-          start: "top+=200",
-          end: "+=1",
-          toggleActions: "play none none reverse",
-          scrub: 2,
-        },
-      });
-
       if (nav) {
         gsap.to(mobileNav.current, { y: 0, opacity: 1, duration: 0.45 });
       } else {
         gsap.to(mobileNav.current, { y: "-100vh", duration: 0.45 });
       }
-
-      gsap.set(".nav-bg", { backgroundColor: "#FCF3FF", opacity: 0 });
-      gsap.set(svg.current, { yPercent: -101 });
-      gsap.set(".hamburger-color-onAnimation", {
-        color: nav ? "#51375b" : isSpecialRoute ? "#fcf3ff" : "#51375b",
-      });
-
-      tl.to(".nav-bg", { opacity: 1 })
-        .to(".desktop-nav-text", { color: "#51375b" })
-        .to(associate.current, { color: "#51375b" }, "<")
-        .to(svg.current, { yPercent: 0, rotate: 0 }, "<")
-        .to(desktopNav.current, { x: -35 }, "<")
-        .to(".hamburger-color-onAnimation", { color: "#51375b" });
     };
 
     loadGSAP();
-  }, [nav, isSpecialRoute]);
+  }, [nav]);
 
   const renderNavLinks = useCallback(
     (mobile = false) => {
@@ -141,12 +160,8 @@ const Navbar = () => {
                 className={`${
                   mobile
                     ? "text-[min(8vw,1.25rem)] w-full leading-loose flex items-center text-[#51375b]"
-                    : `text-[min(0.9375vw,1.125rem)] inline-block ${
-                        isSpecialRoute
-                          ? "text-[#fcf3ffb8] hover:text-[#fcf3ff]"
-                          : "text-[#51375b] hover:text-[#51375bae]"
-                      } desktop-nav-text`
-                } font-semibold transition-all duration-500 ease-out`}
+                    : `text-[min(0.9375vw,1.125rem)] inline-block text-[#fcf3ff] hover:text-[#fcf3ff] desktop-nav-text nav-link-text transition-all duration-300`
+                } font-semibold transition-all duration-300 ease-out`}
                 onClick={(e) => handleClick(e, link)}
               >
                 {link.title}
@@ -158,10 +173,8 @@ const Navbar = () => {
                   className={`${
                     mobile
                       ? "bg-[#fcf3ff] w-full p-2 pl-4 mt-2"
-                      : `${
-                          isSpecialRoute ? "bg-[#fcf3ff]" : "bg-[#d3c2dae7]"
-                        } p-3 absolute block mt-2`
-                  } transition-all duration-500 ease-out`}
+                      : `bg-[#d3c2dae7] p-3 absolute block mt-2 transition-all duration-300`
+                  } transition-all duration-300 ease-out`}
                 >
                   {link.subTitle.map((sublink, subIndex) => (
                     <div key={subIndex}>
@@ -170,8 +183,8 @@ const Navbar = () => {
                         className={`${
                           mobile
                             ? "text-[min(5vw,1.05rem)] w-full leading-loose text-[#51375b80] hover:text-[#51375b]"
-                            : "text-sm font-semibold text-[#51375b80] leading-normal hover:text-[#51375b]"
-                        } transition-all duration-500 z-[4] ease-out`}
+                            : "text-sm font-semibold text-[#51375b80] leading-normal hover:text-[#51375b] transition-all duration-300"
+                        } transition-all duration-300 z-[4] ease-out`}
                         onClick={(e) => handleSubLinkClick(e, mobile)}
                       >
                         {sublink.title}
@@ -189,20 +202,20 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="w-full fixed top-0 left-0 z-[3]">
-      <div className="relative w-full flex items-center justify-between font-medium bg-transparent">
+    <nav className="w-full fixed top-0 left-0 z-[3] nav-scrollable transition-all duration-300 ease-out">
+      <div className="relative w-full flex items-center justify-between font-medium bg-transparent nav-content">
         {/* Marqi Logo */}
-        <div className="pl-[1%] py-[2%] transition-all duration-500 z-[4] md:py-[0.5%] flex items-center gap-4">
+        <div className="pl-[1%] py-[2%] transition-all duration-300 z-[4] md:py-[0.5%] flex items-center gap-4">
           <Link rel="preload" href="/" className="cursor-pointer">
             <Image
-              src={logo}
+              src={logoSrc}
               alt="Marqi Logo"
               priority
-              className="h-[9.25vw] sm2:h-[5vw] md:h-[4.40vw] w-auto object-contain"
+              className="h-[9.25vw] sm2:h-[5vw] md:h-[4.40vw] w-auto object-contain transition-all duration-300 ease-out"
             />
           </Link>
           {/* Brand Text Block */}
-          <div className="flex flex-col leading-tight">
+          {/* <div className="flex flex-col leading-tight">
             <span
               className={`${metropolis.className} metropolis font-semibold tracking-[0.20em] text-[1.7rem] md:text-[3.15vw] text-[transparent] bg-clip-text bg-gradient-to-r from-[rgba(170,115,52,1)] via-[rgba(208,168,93,1)] to-[rgba(182,128,55,1)] uppercase`}
             >
@@ -212,15 +225,15 @@ const Navbar = () => {
               ref={associate}
               className={`${sourcesans.className} sourcesans ${
                 isSpecialRoute ? "text-[#fcf3ff]" : "text-[#51375b]"
-              } text-[0.35rem] md:text-[0.65rem] tracking-[0.25em] uppercase opacity-70 mix-blend-difference`}
-  >
+              } text-[0.35rem] md:text-[0.65rem] tracking-[0.25em] uppercase opacity-70 mix-blend-difference transition-all duration-300`}
+            >
               Design | Build | Materials
             </span>
-          </div>
+          </div> */}
         </div>
         {/* Hamburger Menu */}
         <div
-          className="pr-[0.75%] z-[4] text-[#51375b] md:hidden text-[8vw] flex justify-center items-center hover:cursor-pointer transition-all duration-500 ease-out hamburger-color-onAnimation"
+          className="pr-[0.75%] z-[4] text-[#fcf3ff] md:hidden text-[8vw] flex justify-center items-center hover:cursor-pointer transition-all duration-300 ease-out hamburger-color-onAnimation nav-hamburger"
           onClick={toggleNav}
         >
           <ion-icon name={`${nav ? "close-sharp" : "menu-sharp"}`}></ion-icon>
@@ -230,7 +243,7 @@ const Navbar = () => {
           <ul ref={desktopNav} className="flex uppercase items-center gap-3">
             {renderNavLinks()}
           </ul>
-          <div className="text-[#51375b] text-[1.65vw] absolute right-6 lg:right-5 flex items-center justify-center overflow-hidden cursor-pointer">
+          <div className="text-[#fcf3ff] text-[1.65vw] absolute right-6 lg:right-5 flex items-center justify-center overflow-hidden cursor-pointer transition-all duration-300 nav-scroll-icon">
             <div
               ref={svg}
               className="svg flex items-center rotate-180 justify-center"
@@ -250,7 +263,7 @@ const Navbar = () => {
           {renderNavLinks(true)}
         </ul>
       </div>
-      <div className="absolute z-[-1] w-full h-full top-0 left-0 nav-bg"></div>
+      <div className="absolute z-[-1] w-full h-full top-0 left-0 nav-bg bg-white opacity-0 transition-all duration-300"></div>
     </nav>
   );
 };
