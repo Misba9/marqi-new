@@ -3,7 +3,7 @@
 export default function Video() {
   return (
     <video
-      src={"/final-media/main/video/heroVideo.mp4"}
+      src={"/final-media/main/video/heroVideo-1.mp4"}
       autoPlay
       muted
       loop
